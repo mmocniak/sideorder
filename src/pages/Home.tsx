@@ -111,7 +111,6 @@ export function Home() {
                 onChange={(e) => setSessionName(e.target.value)}
                 placeholder="e.g., Saturday Market, Morning Shift"
                 className="mt-1.5"
-                autoFocus
               />
             </div>
           </div>
