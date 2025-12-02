@@ -130,9 +130,53 @@ export async function seedDefaultMenuItems() {
   }
 }
 
+// Migration: Add Temp modifier group if missing (for existing installs)
+async function migrateTempModifierGroup() {
+  const tempGroup = await db.modifierGroups.get(GROUP_TEMP);
+  if (!tempGroup) {
+    const now = Date.now();
+    await db.modifierGroups.add({
+      id: GROUP_TEMP,
+      name: 'Temp',
+      options: [
+        { id: 'temp-hot', name: 'Hot', available: true },
+        { id: 'temp-iced', name: 'Iced', available: true },
+      ],
+      multiSelect: false,
+      required: false,
+      available: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    // Add Temp to default menu items that should have it
+    const itemsToUpdate = [
+      'item-americano',
+      'item-latte',
+      'item-cappuccino',
+      'item-mocha',
+      'item-drip',
+      'item-pourover',
+      'item-tea',
+      'item-matcha',
+    ];
+
+    for (const itemId of itemsToUpdate) {
+      const item = await db.menuItems.get(itemId);
+      if (item && !item.modifierGroupIds.includes(GROUP_TEMP)) {
+        await db.menuItems.update(itemId, {
+          modifierGroupIds: [...item.modifierGroupIds, GROUP_TEMP],
+          updatedAt: now,
+        });
+      }
+    }
+  }
+}
+
 export async function initializeDatabase() {
   await seedDefaultModifierGroups();
   await seedDefaultMenuItems();
+  await migrateTempModifierGroup();
 }
 
 export { db };

@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Warm Counter theme mapped to ShadCN variables */
+    --background: 40 33% 97%; /* cream */
+    --foreground: 20 18% 15%; /* roast */
+
+    --card: 0 0% 100%;
+    --card-foreground: 20 18% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 18% 15%;
+
+    --primary: 24 26% 28%; /* espresso */
+    --primary-foreground: 40 33% 97%;
+
+    --secondary: 30 18% 79%; /* oat */
+    --secondary-foreground: 20 18% 15%;
+
+    --muted: 30 18% 79%;
+    --muted-foreground: 20 10% 45%;
+
+    --accent: 24 52% 54%; /* terracotta */
+    --accent-foreground: 40 33% 97%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 30 18% 82%;
+    --input: 30 18% 82%;
+    --ring: 24 26% 28%;
+
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Smooth scrolling for the app */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Better touch targets on mobile */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Safe area padding for iOS */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+@layer components {
+  /* Card with warm shadow */
+  .card-warm {
+    @apply bg-white rounded-xl shadow-warm;
+  }
+
+  /* Primary button style */
+  .btn-primary {
+    @apply bg-terracotta hover:bg-terracotta-600 text-white font-medium 
+           px-4 py-2.5 rounded-lg transition-colors duration-150
+           focus:outline-none focus:ring-2 focus:ring-terracotta focus:ring-offset-2;
+  }
+
+  /* Secondary button style */
+  .btn-secondary {
+    @apply bg-oat-100 hover:bg-oat-200 text-espresso font-medium 
+           px-4 py-2.5 rounded-lg transition-colors duration-150
+           focus:outline-none focus:ring-2 focus:ring-espresso focus:ring-offset-2;
+  }
+
+  /* Ghost button style */
+  .btn-ghost {
+    @apply hover:bg-oat-100 text-espresso font-medium 
+           px-4 py-2.5 rounded-lg transition-colors duration-150
+           focus:outline-none focus:ring-2 focus:ring-espresso focus:ring-offset-2;
+  }
+
+  /* Input field styling */
+  .input-field {
+    @apply w-full px-3 py-2.5 rounded-lg border border-oat-300 
+           bg-white text-roast placeholder:text-oat-500
+           focus:outline-none focus:ring-2 focus:ring-espresso focus:border-transparent
+           transition-all duration-150;
+  }
+
+  /* Section heading */
+  .heading-display {
+    @apply font-display text-espresso font-semibold;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
