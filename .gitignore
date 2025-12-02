@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# IDE / Editor
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Vercel
+.vercel
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
