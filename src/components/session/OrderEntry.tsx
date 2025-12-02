@@ -205,6 +205,7 @@ export function OrderEntry({ items, modifierGroups, onSubmit }: OrderEntryProps)
               Cancel
             </Button>
             <Button
+              variant="primary"
               className="flex-1"
               onClick={handleSubmit}
               disabled={!hasAllRequired}
