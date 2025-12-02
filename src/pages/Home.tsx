@@ -129,6 +129,9 @@ export function Home() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Version */}
+      <p className="pt-4 text-center text-xs text-oat-400">v{__APP_VERSION__}</p>
     </div>
   );
 }

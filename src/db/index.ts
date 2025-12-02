@@ -37,6 +37,7 @@ db.version(2).stores({
 const GROUP_SIZE = 'group-size';
 const GROUP_MILK = 'group-milk';
 const GROUP_SYRUPS = 'group-syrups';
+const GROUP_TEMP = 'group-temp';
 
 // Seed default modifier groups if none exist
 export async function seedDefaultModifierGroups() {
@@ -86,6 +87,19 @@ export async function seedDefaultModifierGroups() {
         createdAt: now,
         updatedAt: now,
       },
+      {
+        id: GROUP_TEMP,
+        name: 'Temp',
+        options: [
+          { id: 'temp-hot', name: 'Hot', available: true },
+          { id: 'temp-iced', name: 'Iced', available: true },
+        ],
+        multiSelect: false,
+        required: false,
+        available: true,
+        createdAt: now,
+        updatedAt: now,
+      },
     ]);
   }
 }
@@ -98,20 +112,20 @@ export async function seedDefaultMenuItems() {
     await db.menuItems.bulkAdd([
       // Espresso - no modifiers (simple shot)
       { id: 'item-espresso', name: 'Espresso', category: 'espresso', modifierGroupIds: [], available: true, createdAt: now, updatedAt: now },
-      // Americano - size only
-      { id: 'item-americano', name: 'Americano', category: 'espresso', modifierGroupIds: [GROUP_SIZE], available: true, createdAt: now, updatedAt: now },
-      // Milk-based espresso drinks - size + milk
-      { id: 'item-latte', name: 'Latte', category: 'espresso', modifierGroupIds: [GROUP_SIZE, GROUP_MILK], available: true, createdAt: now, updatedAt: now },
-      { id: 'item-cappuccino', name: 'Cappuccino', category: 'espresso', modifierGroupIds: [GROUP_SIZE, GROUP_MILK], available: true, createdAt: now, updatedAt: now },
-      { id: 'item-mocha', name: 'Mocha', category: 'espresso', modifierGroupIds: [GROUP_SIZE, GROUP_MILK], available: true, createdAt: now, updatedAt: now },
-      // Drip - size only
-      { id: 'item-drip', name: 'Drip Coffee', category: 'drip', modifierGroupIds: [GROUP_SIZE], available: true, createdAt: now, updatedAt: now },
-      // Pour over - no modifiers (typically single serve)
-      { id: 'item-pourover', name: 'Pour Over', category: 'drip', modifierGroupIds: [], available: true, createdAt: now, updatedAt: now },
-      // Tea - size only
-      { id: 'item-tea', name: 'Hot Tea', category: 'tea', modifierGroupIds: [GROUP_SIZE], available: true, createdAt: now, updatedAt: now },
-      // Matcha - size + milk
-      { id: 'item-matcha', name: 'Matcha Latte', category: 'tea', modifierGroupIds: [GROUP_SIZE, GROUP_MILK], available: true, createdAt: now, updatedAt: now },
+      // Americano - size + temp
+      { id: 'item-americano', name: 'Americano', category: 'espresso', modifierGroupIds: [GROUP_SIZE, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      // Milk-based espresso drinks - size + milk + temp
+      { id: 'item-latte', name: 'Latte', category: 'espresso', modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-cappuccino', name: 'Cappuccino', category: 'espresso', modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-mocha', name: 'Mocha', category: 'espresso', modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      // Drip - size + temp
+      { id: 'item-drip', name: 'Drip Coffee', category: 'drip', modifierGroupIds: [GROUP_SIZE, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      // Pour over - temp only (typically single serve)
+      { id: 'item-pourover', name: 'Pour Over', category: 'drip', modifierGroupIds: [GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      // Tea - size + temp
+      { id: 'item-tea', name: 'Hot Tea', category: 'tea', modifierGroupIds: [GROUP_SIZE, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      // Matcha - size + milk + temp
+      { id: 'item-matcha', name: 'Matcha Latte', category: 'tea', modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
     ]);
   }
 }

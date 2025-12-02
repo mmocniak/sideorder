@@ -58,17 +58,6 @@ export function OrderEntry({ items, modifierGroups, onSubmit }: OrderEntryProps)
       item.modifierGroupIds?.includes(group.id)
     );
 
-    // If item has no modifier groups, add directly
-    if (itemGroups.length === 0) {
-      onSubmit({
-        itemName: item.name,
-        itemCategory: item.category,
-        customizations: {},
-        notes: '',
-      });
-      return;
-    }
-
     setSelectedItem(item);
 
     // Set defaults for required single-select groups
