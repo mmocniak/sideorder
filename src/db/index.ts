@@ -89,7 +89,7 @@ export async function seedDefaultModifierGroups() {
       },
       {
         id: GROUP_TEMP,
-        name: 'Temp',
+        name: 'Temperature',
         options: [
           { id: 'temp-hot', name: 'Hot', available: true },
           { id: 'temp-iced', name: 'Iced', available: true },

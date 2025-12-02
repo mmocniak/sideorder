@@ -89,6 +89,8 @@ export function MenuItemForm({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Cappuccino"
+              autoComplete="off"
+              autoCorrect="off"
               className="mt-1.5"
             />
           </div>
