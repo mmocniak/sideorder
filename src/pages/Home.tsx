@@ -166,6 +166,7 @@ export function Home() {
                 value={editingShopName}
                 onChange={(e) => setEditingShopName(e.target.value)}
                 placeholder="Side Order"
+                autoComplete="off"
                 className="mt-1.5"
               />
               <p className="mt-1 text-xs text-oat-500">
