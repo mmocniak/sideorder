@@ -1,10 +1,12 @@
 import Dexie, { type EntityTable } from 'dexie';
-import type { MenuItem, CustomizationOption, Session, Order, ModifierGroup } from './types';
+import type { MenuItem, CustomizationOption, Session, Order, ModifierGroup, Category, Setting } from './types';
 
 const db = new Dexie('SideOrderDB') as Dexie & {
   menuItems: EntityTable<MenuItem, 'id'>;
   customizations: EntityTable<CustomizationOption, 'id'>; // Legacy, kept for migration
   modifierGroups: EntityTable<ModifierGroup, 'id'>;
+  categories: EntityTable<Category, 'id'>;
+  settings: EntityTable<Setting, 'key'>;
   sessions: EntityTable<Session, 'id'>;
   orders: EntityTable<Order, 'id'>;
 };
@@ -31,6 +33,64 @@ db.version(2).stores({
       item.modifierGroupIds = [];
     }
   });
+});
+
+// Default category IDs for reference
+const CAT_ESPRESSO = 'cat-espresso';
+const CAT_DRIP = 'cat-drip';
+const CAT_TEA = 'cat-tea';
+const CAT_OTHER = 'cat-other';
+
+// Version 3: Add categories table, menuItems use categoryId instead of category string
+db.version(3).stores({
+  menuItems: 'id, name, categoryId, available, createdAt',
+  customizations: 'id, category, name, available',
+  modifierGroups: 'id, name, available, createdAt',
+  categories: 'id, name, sortOrder, available, createdAt',
+  sessions: 'id, status, startedAt, endedAt',
+  orders: 'id, sessionId, timestamp',
+}).upgrade(async tx => {
+  const now = Date.now();
+
+  // Create category mapping from old string values to new IDs
+  const categoryMap: Record<string, string> = {
+    'espresso': CAT_ESPRESSO,
+    'drip': CAT_DRIP,
+    'tea': CAT_TEA,
+    'other': CAT_OTHER,
+  };
+
+  // Create default categories
+  const defaultCategories = [
+    { id: CAT_ESPRESSO, name: 'Espresso', sortOrder: 0, available: true, createdAt: now, updatedAt: now },
+    { id: CAT_DRIP, name: 'Drip', sortOrder: 1, available: true, createdAt: now, updatedAt: now },
+    { id: CAT_TEA, name: 'Tea', sortOrder: 2, available: true, createdAt: now, updatedAt: now },
+    { id: CAT_OTHER, name: 'Other', sortOrder: 3, available: true, createdAt: now, updatedAt: now },
+  ];
+
+  await tx.table('categories').bulkAdd(defaultCategories);
+
+  // Migrate menu items to use categoryId
+  await tx.table('menuItems').toCollection().modify(item => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const oldCategory = (item as any).category;
+    if (oldCategory && typeof oldCategory === 'string') {
+      item.categoryId = categoryMap[oldCategory] || CAT_OTHER;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (item as any).category;
+    }
+  });
+});
+
+// Version 4: Add settings table for app preferences
+db.version(4).stores({
+  menuItems: 'id, name, categoryId, available, createdAt',
+  customizations: 'id, category, name, available',
+  modifierGroups: 'id, name, available, createdAt',
+  categories: 'id, name, sortOrder, available, createdAt',
+  settings: 'key',
+  sessions: 'id, status, startedAt, endedAt',
+  orders: 'id, sessionId, timestamp',
 });
 
 // Default modifier group IDs for reference
@@ -104,6 +164,20 @@ export async function seedDefaultModifierGroups() {
   }
 }
 
+// Seed default categories if none exist
+export async function seedDefaultCategories() {
+  const count = await db.categories.count();
+  if (count === 0) {
+    const now = Date.now();
+    await db.categories.bulkAdd([
+      { id: CAT_ESPRESSO, name: 'Espresso', sortOrder: 0, available: true, createdAt: now, updatedAt: now },
+      { id: CAT_DRIP, name: 'Drip', sortOrder: 1, available: true, createdAt: now, updatedAt: now },
+      { id: CAT_TEA, name: 'Tea', sortOrder: 2, available: true, createdAt: now, updatedAt: now },
+      { id: CAT_OTHER, name: 'Other', sortOrder: 3, available: true, createdAt: now, updatedAt: now },
+    ]);
+  }
+}
+
 // Seed a few default menu items if none exist
 export async function seedDefaultMenuItems() {
   const count = await db.menuItems.count();
@@ -111,21 +185,21 @@ export async function seedDefaultMenuItems() {
     const now = Date.now();
     await db.menuItems.bulkAdd([
       // Espresso - no modifiers (simple shot)
-      { id: 'item-espresso', name: 'Espresso', category: 'espresso', modifierGroupIds: [], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-espresso', name: 'Espresso', categoryId: CAT_ESPRESSO, modifierGroupIds: [], available: true, createdAt: now, updatedAt: now },
       // Americano - size + temp
-      { id: 'item-americano', name: 'Americano', category: 'espresso', modifierGroupIds: [GROUP_SIZE, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-americano', name: 'Americano', categoryId: CAT_ESPRESSO, modifierGroupIds: [GROUP_SIZE, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
       // Milk-based espresso drinks - size + milk + temp
-      { id: 'item-latte', name: 'Latte', category: 'espresso', modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
-      { id: 'item-cappuccino', name: 'Cappuccino', category: 'espresso', modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
-      { id: 'item-mocha', name: 'Mocha', category: 'espresso', modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-latte', name: 'Latte', categoryId: CAT_ESPRESSO, modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-cappuccino', name: 'Cappuccino', categoryId: CAT_ESPRESSO, modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-mocha', name: 'Mocha', categoryId: CAT_ESPRESSO, modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
       // Drip - size + temp
-      { id: 'item-drip', name: 'Drip Coffee', category: 'drip', modifierGroupIds: [GROUP_SIZE, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-drip', name: 'Drip Coffee', categoryId: CAT_DRIP, modifierGroupIds: [GROUP_SIZE, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
       // Pour over - temp only (typically single serve)
-      { id: 'item-pourover', name: 'Pour Over', category: 'drip', modifierGroupIds: [GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-pourover', name: 'Pour Over', categoryId: CAT_DRIP, modifierGroupIds: [GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
       // Tea - size + temp
-      { id: 'item-tea', name: 'Hot Tea', category: 'tea', modifierGroupIds: [GROUP_SIZE, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-tea', name: 'Hot Tea', categoryId: CAT_TEA, modifierGroupIds: [GROUP_SIZE, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
       // Matcha - size + milk + temp
-      { id: 'item-matcha', name: 'Matcha Latte', category: 'tea', modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-matcha', name: 'Matcha Latte', categoryId: CAT_TEA, modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
     ]);
   }
 }
@@ -174,6 +248,7 @@ async function migrateTempModifierGroup() {
 }
 
 export async function initializeDatabase() {
+  await seedDefaultCategories();
   await seedDefaultModifierGroups();
   await seedDefaultMenuItems();
   await migrateTempModifierGroup();

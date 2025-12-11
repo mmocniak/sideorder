@@ -9,20 +9,22 @@ import { Menu } from '@/pages/Menu';
 import { initializeDatabase } from '@/db';
 import { useSessionStore } from '@/stores/sessionStore';
 import { useMenuStore } from '@/stores/menuStore';
+import { useSettingsStore } from '@/stores/settingsStore';
 
 function AppContent() {
   const [isReady, setIsReady] = useState(false);
   const loadSessions = useSessionStore((state) => state.loadSessions);
   const loadMenu = useMenuStore((state) => state.loadMenu);
+  const loadSettings = useSettingsStore((state) => state.loadSettings);
 
   useEffect(() => {
     async function init() {
       await initializeDatabase();
-      await Promise.all([loadSessions(), loadMenu()]);
+      await Promise.all([loadSessions(), loadMenu(), loadSettings()]);
       setIsReady(true);
     }
     init();
-  }, [loadSessions, loadMenu]);
+  }, [loadSessions, loadMenu, loadSettings]);
 
   if (!isReady) {
     return (

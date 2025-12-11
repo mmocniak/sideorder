@@ -114,6 +114,7 @@ export default {
       boxShadow: {
         'warm': '0 2px 8px -2px rgba(92, 64, 51, 0.1), 0 4px 16px -4px rgba(92, 64, 51, 0.1)',
         'warm-lg': '0 4px 16px -4px rgba(92, 64, 51, 0.15), 0 8px 32px -8px rgba(92, 64, 51, 0.1)',
+        'warm-sm': '0 1px 3px -1px rgba(92, 64, 51, 0.1), 0 1px 2px -1px rgba(92, 64, 51, 0.06)',
       },
     },
   },

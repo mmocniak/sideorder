@@ -1,7 +1,16 @@
+export interface Category {
+  id: string;
+  name: string;
+  sortOrder: number;
+  available: boolean;
+  createdAt: number;
+  updatedAt: number;
+}
+
 export interface MenuItem {
   id: string;
   name: string;
-  category: 'espresso' | 'drip' | 'tea' | 'other';
+  categoryId: string;
   baseCost?: number;
   available: boolean;
   modifierGroupIds: string[];
@@ -13,7 +22,7 @@ export interface ModifierOption {
   id: string;
   name: string;
   available: boolean;
-  // costModifier?: number; // Reserved for future pricing
+  priceAdditive?: number; // Optional price additive (e.g., 0.50 for +$0.50)
 }
 
 export interface ModifierGroup {
@@ -39,6 +48,7 @@ export interface CustomizationOption {
 export interface MenuSnapshot {
   items: MenuItem[];
   modifierGroups: ModifierGroup[];
+  categories: Category[];
   // Legacy field for backward compatibility
   customizations?: CustomizationOption[];
 }
@@ -70,7 +80,7 @@ export interface Order {
   sessionId: string;
   timestamp: number;
   itemName: string;
-  itemCategory: MenuItem['category'];
+  itemCategory: string; // Category name stored for historical record
   customizations: OrderCustomizations | LegacyOrderCustomizations;
   notes: string;
 }
@@ -86,7 +96,14 @@ export function isNewCustomizations(
 }
 
 // For creating new records
+export type NewCategory = Omit<Category, 'id' | 'createdAt' | 'updatedAt'>;
 export type NewMenuItem = Omit<MenuItem, 'id' | 'createdAt' | 'updatedAt'>;
 export type NewModifierGroup = Omit<ModifierGroup, 'id' | 'createdAt' | 'updatedAt'>;
 export type NewOrder = Omit<Order, 'id' | 'timestamp'>;
+
+// App settings (key-value store)
+export interface Setting {
+  key: string;
+  value: string;
+}
 

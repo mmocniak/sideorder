@@ -9,30 +9,28 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import type { MenuItem, ModifierGroup, OrderCustomizations } from '@/db/types';
+import type { MenuItem, ModifierGroup, Category, OrderCustomizations } from '@/db/types';
 
 interface OrderEntryProps {
   items: MenuItem[];
   modifierGroups: ModifierGroup[];
+  categories: Category[];
   onSubmit: (order: {
     itemName: string;
-    itemCategory: MenuItem['category'];
+    itemCategory: string; // Category name for historical record
     customizations: OrderCustomizations;
     notes: string;
   }) => void;
 }
 
-export function OrderEntry({ items, modifierGroups, onSubmit }: OrderEntryProps) {
+export function OrderEntry({ items, modifierGroups, categories, onSubmit }: OrderEntryProps) {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<OrderCustomizations>({});
   const [notes, setNotes] = useState('');
 
-  const categories = ['espresso', 'drip', 'tea', 'other'] as const;
-  const categoryLabels: Record<typeof categories[number], string> = {
-    espresso: 'Espresso',
-    drip: 'Drip',
-    tea: 'Tea',
-    other: 'Other',
+  // Create a lookup map for category names
+  const getCategoryName = (categoryId: string) => {
+    return categories.find(c => c.id === categoryId)?.name || 'Other';
   };
 
   // Get modifier groups for the selected item
@@ -100,7 +98,7 @@ export function OrderEntry({ items, modifierGroups, onSubmit }: OrderEntryProps)
 
     onSubmit({
       itemName: selectedItem.name,
-      itemCategory: selectedItem.category,
+      itemCategory: getCategoryName(selectedItem.categoryId),
       customizations: selectedOptions,
       notes,
     });
@@ -128,7 +126,7 @@ export function OrderEntry({ items, modifierGroups, onSubmit }: OrderEntryProps)
 
     onSubmit({
       itemName: item.name,
-      itemCategory: item.category,
+      itemCategory: getCategoryName(item.categoryId),
       customizations: defaults,
       notes: '',
     });
@@ -139,13 +137,13 @@ export function OrderEntry({ items, modifierGroups, onSubmit }: OrderEntryProps)
       {/* Item Grid */}
       <div className="space-y-4">
         {categories.map((category) => {
-          const categoryItems = items.filter((item) => item.category === category);
+          const categoryItems = items.filter((item) => item.categoryId === category.id);
           if (categoryItems.length === 0) return null;
 
           return (
-            <div key={category}>
+            <div key={category.id}>
               <h3 className="mb-2 text-sm font-medium text-oat-600">
-                {categoryLabels[category]}
+                {category.name}
               </h3>
               <div className="grid grid-cols-1 gap-2">
                 {categoryItems.map((item) => (
@@ -246,6 +244,10 @@ function ModifierGroupSelector({
         {availableOptions.map((option) => {
           const isSelected = selected.includes(option.name);
 
+          const priceLabel = option.priceAdditive != null && option.priceAdditive > 0
+            ? ` (+$${option.priceAdditive.toFixed(2)})`
+            : '';
+
           if (group.multiSelect) {
             // Multi-select: toggle chips
             return (
@@ -260,6 +262,7 @@ function ModifierGroupSelector({
                 )}
               >
                 {option.name}
+                {priceLabel && <span className="opacity-75">{priceLabel}</span>}
               </button>
             );
           }
@@ -277,6 +280,7 @@ function ModifierGroupSelector({
               )}
             >
               {option.name}
+              {priceLabel && <span className="opacity-75">{priceLabel}</span>}
             </button>
           );
         })}

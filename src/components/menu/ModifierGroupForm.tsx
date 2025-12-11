@@ -70,6 +70,17 @@ export function ModifierGroupForm({
     );
   };
 
+  const handleUpdateOptionPrice = (id: string, price: string) => {
+    const numValue = parseFloat(price);
+    setOptions(
+      options.map((opt) =>
+        opt.id === id
+          ? { ...opt, priceAdditive: price === '' ? undefined : (isNaN(numValue) ? opt.priceAdditive : numValue) }
+          : opt
+      )
+    );
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || options.length === 0) return;
@@ -143,6 +154,18 @@ export function ModifierGroupForm({
                   >
                     {option.name}
                   </span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-oat-500">+$</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={option.priceAdditive ?? ''}
+                      onChange={(e) => handleUpdateOptionPrice(option.id, e.target.value)}
+                      placeholder="0.00"
+                      className="w-16 rounded border border-oat-200 bg-white px-1.5 py-0.5 text-sm text-espresso placeholder:text-oat-300 focus:border-terracotta focus:outline-none focus:ring-1 focus:ring-terracotta"
+                    />
+                  </div>
                   <button
                     type="button"
                     onClick={() => handleToggleOptionAvailable(option.id)}

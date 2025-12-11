@@ -50,10 +50,11 @@ export function ActiveSession() {
   // Use session snapshot for available items during the session
   const availableItems = activeSession.menuSnapshot.items;
   const availableModifierGroups = activeSession.menuSnapshot.modifierGroups || [];
+  const availableCategories = activeSession.menuSnapshot.categories || [];
 
   const handleAddOrder = async (order: {
     itemName: string;
-    itemCategory: 'espresso' | 'drip' | 'tea' | 'other';
+    itemCategory: string;
     customizations: Record<string, string[]>;
     notes: string;
   }) => {
@@ -127,6 +128,7 @@ export function ActiveSession() {
           <OrderEntry
             items={availableItems}
             modifierGroups={availableModifierGroups}
+            categories={availableCategories}
             onSubmit={handleAddOrder}
           />
         </TabsContent>

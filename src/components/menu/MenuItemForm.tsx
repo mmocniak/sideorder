@@ -15,13 +15,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import type { MenuItem, ModifierGroup, NewMenuItem } from '@/db/types';
+import type { MenuItem, ModifierGroup, Category, NewMenuItem } from '@/db/types';
 
 interface MenuItemFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   item?: MenuItem | null;
   modifierGroups: ModifierGroup[];
+  categories: Category[];
   onSubmit: (data: NewMenuItem) => void;
 }
 
@@ -30,26 +31,29 @@ export function MenuItemForm({
   onOpenChange,
   item,
   modifierGroups,
+  categories,
   onSubmit,
 }: MenuItemFormProps) {
   const [name, setName] = useState('');
-  const [category, setCategory] = useState<MenuItem['category']>('espresso');
+  const [categoryId, setCategoryId] = useState('');
   const [baseCost, setBaseCost] = useState('');
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
 
+  // Set default category on first load or when categories change
   useEffect(() => {
     if (item) {
       setName(item.name);
-      setCategory(item.category);
+      setCategoryId(item.categoryId);
       setBaseCost(item.baseCost?.toString() ?? '');
       setSelectedGroupIds(item.modifierGroupIds || []);
     } else {
       setName('');
-      setCategory('espresso');
+      // Default to first available category
+      setCategoryId(categories.find(c => c.available)?.id || categories[0]?.id || '');
       setBaseCost('');
       setSelectedGroupIds([]);
     }
-  }, [item, open]);
+  }, [item, open, categories]);
 
   const handleToggleGroup = (groupId: string) => {
     setSelectedGroupIds((prev) =>
@@ -61,11 +65,11 @@ export function MenuItemForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!name.trim() || !categoryId) return;
 
     onSubmit({
       name: name.trim(),
-      category,
+      categoryId,
       baseCost: baseCost ? parseFloat(baseCost) : undefined,
       modifierGroupIds: selectedGroupIds,
       available: item?.available ?? true,
@@ -97,15 +101,16 @@ export function MenuItemForm({
 
           <div>
             <Label htmlFor="category">Category</Label>
-            <Select value={category} onValueChange={(v) => setCategory(v as MenuItem['category'])}>
+            <Select value={categoryId} onValueChange={setCategoryId}>
               <SelectTrigger className="mt-1.5">
-                <SelectValue />
+                <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="espresso">Espresso</SelectItem>
-                <SelectItem value="drip">Drip</SelectItem>
-                <SelectItem value="tea">Tea</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

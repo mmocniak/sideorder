@@ -51,6 +51,9 @@ export function ModifierGroupCard({
                 className="rounded-md border border-oat-200 bg-oat-50 px-2 py-0.5 text-sm text-oat-700"
               >
                 {option.name}
+                {option.priceAdditive != null && option.priceAdditive > 0 && (
+                  <span className="ml-1 text-oat-500">(+${option.priceAdditive.toFixed(2)})</span>
+                )}
               </span>
             ))}
             {availableOptions.length === 0 && (

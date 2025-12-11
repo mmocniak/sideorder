@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Clock } from 'lucide-react';
+import { Plus, Clock, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,13 +14,21 @@ import {
 import { SessionCard } from '@/components/session/SessionCard';
 import { useSessionStore } from '@/stores/sessionStore';
 import { useMenuStore } from '@/stores/menuStore';
+import { useSettingsStore } from '@/stores/settingsStore';
+import { getTagline } from '@/lib/taglines';
 
 export function Home() {
   const navigate = useNavigate();
   const { sessions, activeSession, startSession } = useSessionStore();
   const { getSnapshot } = useMenuStore();
+  const { shopName, updateShopName } = useSettingsStore();
   const [showStartDialog, setShowStartDialog] = useState(false);
   const [sessionName, setSessionName] = useState('');
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [editingShopName, setEditingShopName] = useState('');
+
+  // Get tagline once per session (stored in sessionStorage)
+  const tagline = useMemo(() => getTagline(), []);
 
   const recentSessions = sessions
     .filter((s) => s.status === 'closed')
@@ -39,9 +47,9 @@ export function Home() {
       {/* Hero Section */}
       <div className="text-center">
         <h1 className="font-display text-3xl font-bold text-espresso">
-          Side Order
+          {shopName}
         </h1>
-        <p className="mt-1 text-oat-600">Session tracking for Side Hustle</p>
+        <p className="mt-1 text-oat-600">{tagline}</p>
       </div>
 
       {/* Active Session or Start New */}
@@ -129,8 +137,62 @@ export function Home() {
         </DialogContent>
       </Dialog>
 
-      {/* Version */}
-      <p className="pt-4 text-center text-xs text-oat-400">v{__APP_VERSION__}</p>
+      {/* Version & Settings */}
+      <div className="flex flex-col items-center gap-2 pt-4">
+        <p className="text-xs text-oat-400">v{__APP_VERSION__}</p>
+        <button
+          onClick={() => {
+            setEditingShopName(shopName);
+            setShowSettingsDialog(true);
+          }}
+          className="flex min-h-0 items-center gap-1.5 rounded-full bg-oat-100 px-3 py-2 text-xs text-oat-600 transition-colors hover:bg-oat-200"
+        >
+          <Settings className="h-3 w-3" />
+          Settings
+        </button>
+      </div>
+
+      {/* Settings Dialog */}
+      <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Settings</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label htmlFor="shopName">Shop Name</Label>
+              <Input
+                id="shopName"
+                value={editingShopName}
+                onChange={(e) => setEditingShopName(e.target.value)}
+                placeholder="Side Order"
+                className="mt-1.5"
+              />
+              <p className="mt-1 text-xs text-oat-500">
+                Displayed at the top of the home page
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => setShowSettingsDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="flex-1"
+              onClick={async () => {
+                await updateShopName(editingShopName);
+                setShowSettingsDialog(false);
+              }}
+            >
+              Save
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
