@@ -12,7 +12,7 @@ import { SessionStats } from '@/components/session/SessionStats';
 import { OrderList } from '@/components/session/OrderList';
 import { useSessionStore } from '@/stores/sessionStore';
 import { useOrderStore } from '@/stores/orderStore';
-import { formatSessionDate, formatTime } from '@/lib/utils';
+import { formatSessionDate, formatTime, formatPrice, calculateTotalRevenue, calculateOrderPrice } from '@/lib/utils';
 
 export function SessionDetail() {
   const { id } = useParams<{ id: string }>();
@@ -46,12 +46,23 @@ export function SessionDetail() {
     navigate('/history');
   };
 
-  // Organize orders by item for summary
+  // Calculate total revenue
+  const totalRevenue = calculateTotalRevenue(orders, session.menuSnapshot);
+
+  // Organize orders by item for summary with prices
   const orderSummary = orders.reduce((acc, order) => {
     const key = order.itemName;
-    acc[key] = (acc[key] || 0) + 1;
+    const price = calculateOrderPrice(order, session.menuSnapshot);
+    if (!acc[key]) {
+      acc[key] = { count: 0, totalPrice: 0, hasPrice: false };
+    }
+    acc[key].count += 1;
+    if (price != null) {
+      acc[key].totalPrice += price;
+      acc[key].hasPrice = true;
+    }
     return acc;
-  }, {} as Record<string, number>);
+  }, {} as Record<string, { count: number; totalPrice: number; hasPrice: boolean }>);
 
   return (
     <div className="space-y-6">
@@ -98,7 +109,7 @@ export function SessionDetail() {
       </div>
 
       {/* Stats */}
-      <SessionStats session={session} orderCount={orders.length} />
+      <SessionStats session={session} orderCount={orders.length} totalRevenue={totalRevenue} />
 
       {/* Order Summary */}
       {Object.keys(orderSummary).length > 0 && (
@@ -109,14 +120,19 @@ export function SessionDetail() {
           <div className="rounded-xl bg-white p-4 shadow-warm">
             <div className="space-y-2">
               {Object.entries(orderSummary)
-                .sort((a, b) => b[1] - a[1])
-                .map(([item, count]) => (
+                .sort((a, b) => b[1].count - a[1].count)
+                .map(([item, { count, totalPrice, hasPrice }]) => (
                   <div
                     key={item}
                     className="flex items-center justify-between text-sm"
                   >
                     <span className="text-espresso">{item}</span>
-                    <span className="font-medium text-oat-600">×{count}</span>
+                    <div className="flex items-center gap-3">
+                      {hasPrice && (
+                        <span className="text-oat-500">{formatPrice(totalPrice)}</span>
+                      )}
+                      <span className="font-medium text-oat-600">×{count}</span>
+                    </div>
                   </div>
                 ))}
             </div>
@@ -129,7 +145,7 @@ export function SessionDetail() {
         <h2 className="mb-3 font-display text-lg font-semibold text-espresso">
           All Orders
         </h2>
-        <OrderList orders={orders} readonly />
+        <OrderList orders={orders} readonly menuSnapshot={session.menuSnapshot} />
       </div>
 
       {/* Delete Confirmation */}

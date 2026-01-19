@@ -93,6 +93,45 @@ db.version(4).stores({
   orders: 'id, sessionId, timestamp',
 });
 
+// Version 5: Add sortOrder to menuItems and modifierGroups for drag-to-reorder
+db.version(5).stores({
+  menuItems: 'id, name, categoryId, sortOrder, available, createdAt',
+  customizations: 'id, category, name, available',
+  modifierGroups: 'id, name, sortOrder, available, createdAt',
+  categories: 'id, name, sortOrder, available, createdAt',
+  settings: 'key',
+  sessions: 'id, status, startedAt, endedAt',
+  orders: 'id, sessionId, timestamp',
+}).upgrade(async tx => {
+  // Add sortOrder to existing menu items (grouped by category, ordered by createdAt)
+  const menuItems = await tx.table('menuItems').toArray();
+  const itemsByCategory: Record<string, typeof menuItems> = {};
+
+  // Group items by category
+  for (const item of menuItems) {
+    const catId = item.categoryId || 'uncategorized';
+    if (!itemsByCategory[catId]) {
+      itemsByCategory[catId] = [];
+    }
+    itemsByCategory[catId].push(item);
+  }
+
+  // Sort each category by createdAt and assign sortOrder
+  for (const catId in itemsByCategory) {
+    const items = itemsByCategory[catId].sort((a, b) => a.createdAt - b.createdAt);
+    for (let i = 0; i < items.length; i++) {
+      await tx.table('menuItems').update(items[i].id, { sortOrder: i });
+    }
+  }
+
+  // Add sortOrder to existing modifier groups (ordered by createdAt)
+  const modifierGroups = await tx.table('modifierGroups').toArray();
+  const sortedGroups = modifierGroups.sort((a, b) => a.createdAt - b.createdAt);
+  for (let i = 0; i < sortedGroups.length; i++) {
+    await tx.table('modifierGroups').update(sortedGroups[i].id, { sortOrder: i });
+  }
+});
+
 // Default modifier group IDs for reference
 const GROUP_SIZE = 'group-size';
 const GROUP_MILK = 'group-milk';
@@ -116,6 +155,7 @@ export async function seedDefaultModifierGroups() {
         multiSelect: false,
         required: true,
         available: true,
+        sortOrder: 0,
         createdAt: now,
         updatedAt: now,
       },
@@ -130,6 +170,7 @@ export async function seedDefaultModifierGroups() {
         multiSelect: false,
         required: true,
         available: true,
+        sortOrder: 1,
         createdAt: now,
         updatedAt: now,
       },
@@ -144,6 +185,7 @@ export async function seedDefaultModifierGroups() {
         multiSelect: true,
         required: false,
         available: true,
+        sortOrder: 2,
         createdAt: now,
         updatedAt: now,
       },
@@ -157,6 +199,7 @@ export async function seedDefaultModifierGroups() {
         multiSelect: false,
         required: false,
         available: true,
+        sortOrder: 3,
         createdAt: now,
         updatedAt: now,
       },
@@ -185,21 +228,21 @@ export async function seedDefaultMenuItems() {
     const now = Date.now();
     await db.menuItems.bulkAdd([
       // Espresso - no modifiers (simple shot)
-      { id: 'item-espresso', name: 'Espresso', categoryId: CAT_ESPRESSO, modifierGroupIds: [], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-espresso', name: 'Espresso', categoryId: CAT_ESPRESSO, modifierGroupIds: [], sortOrder: 0, available: true, createdAt: now, updatedAt: now },
       // Americano - size + temp
-      { id: 'item-americano', name: 'Americano', categoryId: CAT_ESPRESSO, modifierGroupIds: [GROUP_SIZE, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-americano', name: 'Americano', categoryId: CAT_ESPRESSO, modifierGroupIds: [GROUP_SIZE, GROUP_TEMP], sortOrder: 1, available: true, createdAt: now, updatedAt: now },
       // Milk-based espresso drinks - size + milk + temp
-      { id: 'item-latte', name: 'Latte', categoryId: CAT_ESPRESSO, modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
-      { id: 'item-cappuccino', name: 'Cappuccino', categoryId: CAT_ESPRESSO, modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
-      { id: 'item-mocha', name: 'Mocha', categoryId: CAT_ESPRESSO, modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-latte', name: 'Latte', categoryId: CAT_ESPRESSO, modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], sortOrder: 2, available: true, createdAt: now, updatedAt: now },
+      { id: 'item-cappuccino', name: 'Cappuccino', categoryId: CAT_ESPRESSO, modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], sortOrder: 3, available: true, createdAt: now, updatedAt: now },
+      { id: 'item-mocha', name: 'Mocha', categoryId: CAT_ESPRESSO, modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], sortOrder: 4, available: true, createdAt: now, updatedAt: now },
       // Drip - size + temp
-      { id: 'item-drip', name: 'Drip Coffee', categoryId: CAT_DRIP, modifierGroupIds: [GROUP_SIZE, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-drip', name: 'Drip Coffee', categoryId: CAT_DRIP, modifierGroupIds: [GROUP_SIZE, GROUP_TEMP], sortOrder: 0, available: true, createdAt: now, updatedAt: now },
       // Pour over - temp only (typically single serve)
-      { id: 'item-pourover', name: 'Pour Over', categoryId: CAT_DRIP, modifierGroupIds: [GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-pourover', name: 'Pour Over', categoryId: CAT_DRIP, modifierGroupIds: [GROUP_TEMP], sortOrder: 1, available: true, createdAt: now, updatedAt: now },
       // Tea - size + temp
-      { id: 'item-tea', name: 'Hot Tea', categoryId: CAT_TEA, modifierGroupIds: [GROUP_SIZE, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-tea', name: 'Hot Tea', categoryId: CAT_TEA, modifierGroupIds: [GROUP_SIZE, GROUP_TEMP], sortOrder: 0, available: true, createdAt: now, updatedAt: now },
       // Matcha - size + milk + temp
-      { id: 'item-matcha', name: 'Matcha Latte', categoryId: CAT_TEA, modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], available: true, createdAt: now, updatedAt: now },
+      { id: 'item-matcha', name: 'Matcha Latte', categoryId: CAT_TEA, modifierGroupIds: [GROUP_SIZE, GROUP_MILK, GROUP_TEMP], sortOrder: 1, available: true, createdAt: now, updatedAt: now },
     ]);
   }
 }
@@ -209,6 +252,9 @@ async function migrateTempModifierGroup() {
   const tempGroup = await db.modifierGroups.get(GROUP_TEMP);
   if (!tempGroup) {
     const now = Date.now();
+    // Get max sortOrder to place at end
+    const allGroups = await db.modifierGroups.toArray();
+    const maxSortOrder = allGroups.length > 0 ? Math.max(...allGroups.map(g => g.sortOrder ?? 0)) : -1;
     await db.modifierGroups.add({
       id: GROUP_TEMP,
       name: 'Temp',
@@ -219,6 +265,7 @@ async function migrateTempModifierGroup() {
       multiSelect: false,
       required: false,
       available: true,
+      sortOrder: maxSortOrder + 1,
       createdAt: now,
       updatedAt: now,
     });

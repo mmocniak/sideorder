@@ -6,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { DragHandle } from '@/components/ui/sortable-list';
 import { cn } from '@/lib/utils';
 import type { ModifierGroup } from '@/db/types';
 
@@ -14,6 +15,7 @@ interface ModifierGroupCardProps {
   onEdit: (group: ModifierGroup) => void;
   onDelete: (id: string) => void;
   onToggleAvailable: (id: string, available: boolean) => void;
+  showDragHandle?: boolean;
 }
 
 export function ModifierGroupCard({
@@ -21,6 +23,7 @@ export function ModifierGroupCard({
   onEdit,
   onDelete,
   onToggleAvailable,
+  showDragHandle = false,
 }: ModifierGroupCardProps) {
   const availableOptions = group.options.filter((opt) => opt.available);
 
@@ -31,7 +34,8 @@ export function ModifierGroupCard({
         !group.available && 'border-dashed opacity-60'
       )}
     >
-      <div className="flex items-start justify-between">
+      <div className="flex items-start gap-2">
+        {showDragHandle && <DragHandle className="mt-0.5" />}
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <span className="font-medium text-espresso">{group.name}</span>

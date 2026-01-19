@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SortableList } from '@/components/ui/sortable-list';
 import { MenuItemCard } from '@/components/menu/MenuItemCard';
 import { MenuItemForm } from '@/components/menu/MenuItemForm';
 import { ModifierGroupCard } from '@/components/menu/ModifierGroupCard';
@@ -26,6 +27,9 @@ export function Menu() {
     addCategory,
     updateCategory,
     deleteCategory,
+    reorderItems,
+    reorderModifierGroups,
+    reorderCategories,
     getSnapshot,
   } = useMenuStore();
   const { activeSession, updateActiveSessionSnapshot } = useSessionStore();
@@ -184,7 +188,9 @@ export function Menu() {
 
         <TabsContent value="items" className="space-y-6">
           {categories.map((category) => {
-            const categoryItems = items.filter((item) => item.categoryId === category.id);
+            const categoryItems = items
+              .filter((item) => item.categoryId === category.id)
+              .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
             if (categoryItems.length === 0) return null;
 
             return (
@@ -192,11 +198,19 @@ export function Menu() {
                 <h3 className="mb-2 text-sm font-medium text-oat-600">
                   {category.name}
                 </h3>
-                <div className="space-y-2">
-                  {categoryItems.map((item) => (
+                <SortableList
+                  items={categoryItems}
+                  onReorder={(reorderedItems) => {
+                    reorderItems(category.id, reorderedItems.map((item) => item.id));
+                    if (activeSession) {
+                      updateActiveSessionSnapshot(getSnapshot());
+                    }
+                  }}
+                  className="space-y-2"
+                  renderItem={(item) => (
                     <MenuItemCard
-                      key={item.id}
                       item={item}
+                      showDragHandle
                       onEdit={(item) => {
                         setEditingItem(item);
                         setShowItemForm(true);
@@ -204,8 +218,8 @@ export function Menu() {
                       onDelete={handleDeleteItem}
                       onToggleAvailable={handleToggleItemAvailable}
                     />
-                  ))}
-                </div>
+                  )}
+                />
               </div>
             );
           })}
@@ -225,20 +239,30 @@ export function Menu() {
         </TabsContent>
 
         <TabsContent value="groups" className="space-y-4">
-          {modifierGroups.map((group) => (
-            <ModifierGroupCard
-              key={group.id}
-              group={group}
-              onEdit={(group) => {
-                setEditingGroup(group);
-                setShowGroupForm(true);
+          {modifierGroups.length > 0 ? (
+            <SortableList
+              items={modifierGroups}
+              onReorder={(reorderedGroups) => {
+                reorderModifierGroups(reorderedGroups.map((group) => group.id));
+                if (activeSession) {
+                  updateActiveSessionSnapshot(getSnapshot());
+                }
               }}
-              onDelete={handleDeleteGroup}
-              onToggleAvailable={handleToggleGroupAvailable}
+              className="space-y-4"
+              renderItem={(group) => (
+                <ModifierGroupCard
+                  group={group}
+                  showDragHandle
+                  onEdit={(group) => {
+                    setEditingGroup(group);
+                    setShowGroupForm(true);
+                  }}
+                  onDelete={handleDeleteGroup}
+                  onToggleAvailable={handleToggleGroupAvailable}
+                />
+              )}
             />
-          ))}
-
-          {modifierGroups.length === 0 && (
+          ) : (
             <div className="rounded-xl border border-dashed border-oat-300 bg-oat-50 py-12 text-center">
               <p className="text-oat-500">No modifier groups yet</p>
               <Button
@@ -253,21 +277,31 @@ export function Menu() {
         </TabsContent>
 
         <TabsContent value="categories" className="space-y-4">
-          {categories.map((category) => (
-            <CategoryCard
-              key={category.id}
-              category={category}
-              itemCount={getItemCount(category.id)}
-              onEdit={(category) => {
-                setEditingCategory(category);
-                setShowCategoryForm(true);
+          {categories.length > 0 ? (
+            <SortableList
+              items={categories}
+              onReorder={(reorderedCategories) => {
+                reorderCategories(reorderedCategories.map((cat) => cat.id));
+                if (activeSession) {
+                  updateActiveSessionSnapshot(getSnapshot());
+                }
               }}
-              onDelete={handleDeleteCategory}
-              onToggleAvailable={handleToggleCategoryAvailable}
+              className="space-y-4"
+              renderItem={(category) => (
+                <CategoryCard
+                  category={category}
+                  itemCount={getItemCount(category.id)}
+                  showDragHandle
+                  onEdit={(category) => {
+                    setEditingCategory(category);
+                    setShowCategoryForm(true);
+                  }}
+                  onDelete={handleDeleteCategory}
+                  onToggleAvailable={handleToggleCategoryAvailable}
+                />
+              )}
             />
-          ))}
-
-          {categories.length === 0 && (
+          ) : (
             <div className="rounded-xl border border-dashed border-oat-300 bg-oat-50 py-12 text-center">
               <p className="text-oat-500">No categories yet</p>
               <Button

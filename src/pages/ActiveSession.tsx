@@ -18,16 +18,20 @@ import { OrderEntry } from '@/components/session/OrderEntry';
 import { useSessionStore } from '@/stores/sessionStore';
 import { useOrderStore } from '@/stores/orderStore';
 import { useMenuStore } from '@/stores/menuStore';
+import { calculateTotalRevenue } from '@/lib/utils';
+import type { Order, OrderCustomizations } from '@/db/types';
 
 export function ActiveSession() {
   const navigate = useNavigate();
   const { activeSession, updateSession, endSession } = useSessionStore();
-  const { orders, loadOrdersForSession, addOrder, deleteOrder } = useOrderStore();
+  const { orders, loadOrdersForSession, addOrder, deleteOrder, updateOrder } = useOrderStore();
   const { loadMenu } = useMenuStore();
 
   const [showSettings, setShowSettings] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [notes, setNotes] = useState('');
+  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
+  const [activeTab, setActiveTab] = useState<'order' | 'history'>('order');
 
   useEffect(() => {
     if (!activeSession) {
@@ -52,6 +56,9 @@ export function ActiveSession() {
   const availableModifierGroups = activeSession.menuSnapshot.modifierGroups || [];
   const availableCategories = activeSession.menuSnapshot.categories || [];
 
+  // Calculate total revenue from orders
+  const totalRevenue = calculateTotalRevenue(orders, activeSession.menuSnapshot);
+
   const handleAddOrder = async (order: {
     itemName: string;
     itemCategory: string;
@@ -62,6 +69,19 @@ export function ActiveSession() {
       sessionId: activeSession.id,
       ...order,
     });
+  };
+
+  const handleUpdateOrder = async (orderId: string, updates: {
+    customizations: OrderCustomizations;
+    notes: string;
+  }) => {
+    await updateOrder(orderId, updates);
+    setEditingOrder(null);
+  };
+
+  const handleEditOrder = (order: Order) => {
+    setEditingOrder(order);
+    setActiveTab('order'); // Switch to order tab to show the edit dialog
   };
 
   const handleUpdateSettings = async () => {
@@ -107,7 +127,7 @@ export function ActiveSession() {
       </div>
 
       {/* Stats */}
-      <SessionStats session={activeSession} orderCount={orders.length} />
+      <SessionStats session={activeSession} orderCount={orders.length} totalRevenue={totalRevenue} />
 
       {/* Customer Tally */}
       <CustomerTally
@@ -116,9 +136,15 @@ export function ActiveSession() {
       />
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="order" className="w-full">
+      <Tabs
+        value={activeTab}
+        onValueChange={(v) => setActiveTab(v as 'order' | 'history')}
+        className="w-full"
+      >
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="order">New Order</TabsTrigger>
+          <TabsTrigger value="order">
+            {editingOrder ? 'Edit Order' : 'New Order'}
+          </TabsTrigger>
           <TabsTrigger value="history">
             Orders ({orders.length})
           </TabsTrigger>
@@ -130,11 +156,19 @@ export function ActiveSession() {
             modifierGroups={availableModifierGroups}
             categories={availableCategories}
             onSubmit={handleAddOrder}
+            editingOrder={editingOrder}
+            onCancelEdit={() => setEditingOrder(null)}
+            onUpdate={handleUpdateOrder}
           />
         </TabsContent>
 
         <TabsContent value="history">
-          <OrderList orders={orders} onDelete={deleteOrder} />
+          <OrderList
+            orders={orders}
+            onDelete={deleteOrder}
+            onEdit={handleEditOrder}
+            menuSnapshot={activeSession.menuSnapshot}
+          />
         </TabsContent>
       </Tabs>
 

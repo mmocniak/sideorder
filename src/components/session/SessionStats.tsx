@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Clock, Coffee, Users } from 'lucide-react';
-import { formatDuration } from '@/lib/utils';
+import { Clock, Coffee, Users, DollarSign } from 'lucide-react';
+import { formatDuration, formatPrice } from '@/lib/utils';
 import type { Session } from '@/db/types';
 
 interface SessionStatsProps {
   session: Session;
   orderCount: number;
+  totalRevenue?: number | null;
 }
 
-export function SessionStats({ session, orderCount }: SessionStatsProps) {
+export function SessionStats({ session, orderCount, totalRevenue }: SessionStatsProps) {
   const [elapsed, setElapsed] = useState(() =>
     formatDuration(session.startedAt)
   );
@@ -41,10 +42,15 @@ export function SessionStats({ session, orderCount }: SessionStatsProps) {
       label: 'Customers',
       value: session.customerCount?.toString() ?? '—',
     },
+    {
+      icon: DollarSign,
+      label: 'Total',
+      value: formatPrice(totalRevenue),
+    },
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-4 gap-3">
       {stats.map(({ icon: Icon, label, value }) => (
         <div
           key={label}

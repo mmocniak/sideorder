@@ -25,6 +25,11 @@ interface MenuState {
   updateCategory: (id: string, updates: Partial<Category>) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
 
+  // Reorder actions
+  reorderItems: (categoryId: string, itemIds: string[]) => Promise<void>;
+  reorderModifierGroups: (groupIds: string[]) => Promise<void>;
+  reorderCategories: (categoryIds: string[]) => Promise<void>;
+
   // Snapshot for sessions
   getSnapshot: () => MenuSnapshot;
 }
@@ -42,17 +47,27 @@ export const useMenuStore = create<MenuState>((set, get) => ({
       db.modifierGroups.toArray(),
       db.categories.toArray(),
     ]);
-    // Sort categories by sortOrder
+    // Sort all by sortOrder
+    items.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    modifierGroups.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
     categories.sort((a, b) => a.sortOrder - b.sortOrder);
     set({ items, modifierGroups, categories, isLoading: false });
   },
 
   addItem: async (item) => {
     const now = Date.now();
+    const { items } = get();
+    // Calculate sortOrder for new item (max in category + 1)
+    const categoryItems = items.filter(i => i.categoryId === item.categoryId);
+    const maxSortOrder = categoryItems.length > 0
+      ? Math.max(...categoryItems.map(i => i.sortOrder ?? 0))
+      : -1;
+
     const newItem: MenuItem = {
       ...item,
       id: generateId(),
       modifierGroupIds: item.modifierGroupIds || [],
+      sortOrder: item.sortOrder ?? maxSortOrder + 1,
       createdAt: now,
       updatedAt: now,
     };
@@ -80,9 +95,16 @@ export const useMenuStore = create<MenuState>((set, get) => ({
 
   addModifierGroup: async (group) => {
     const now = Date.now();
+    const { modifierGroups } = get();
+    // Calculate sortOrder for new group (max + 1)
+    const maxSortOrder = modifierGroups.length > 0
+      ? Math.max(...modifierGroups.map(g => g.sortOrder ?? 0))
+      : -1;
+
     const newGroup: ModifierGroup = {
       ...group,
       id: generateId(),
+      sortOrder: group.sortOrder ?? maxSortOrder + 1,
       createdAt: now,
       updatedAt: now,
     };
@@ -190,6 +212,88 @@ export const useMenuStore = create<MenuState>((set, get) => ({
         categories: state.categories.filter((cat) => cat.id !== id),
       }));
     }
+  },
+
+  reorderItems: async (categoryId, itemIds) => {
+    const now = Date.now();
+    // Update sortOrder for each item in the new order
+    const updates = itemIds.map((id, index) => ({
+      id,
+      sortOrder: index,
+      updatedAt: now,
+    }));
+
+    // Persist to database
+    await Promise.all(
+      updates.map(({ id, sortOrder, updatedAt }) =>
+        db.menuItems.update(id, { sortOrder, updatedAt })
+      )
+    );
+
+    // Update local state
+    set((state) => ({
+      items: state.items
+        .map((item) => {
+          if (item.categoryId !== categoryId) return item;
+          const update = updates.find((u) => u.id === item.id);
+          return update ? { ...item, sortOrder: update.sortOrder, updatedAt: update.updatedAt } : item;
+        })
+        .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
+    }));
+  },
+
+  reorderModifierGroups: async (groupIds) => {
+    const now = Date.now();
+    // Update sortOrder for each group in the new order
+    const updates = groupIds.map((id, index) => ({
+      id,
+      sortOrder: index,
+      updatedAt: now,
+    }));
+
+    // Persist to database
+    await Promise.all(
+      updates.map(({ id, sortOrder, updatedAt }) =>
+        db.modifierGroups.update(id, { sortOrder, updatedAt })
+      )
+    );
+
+    // Update local state
+    set((state) => ({
+      modifierGroups: state.modifierGroups
+        .map((group) => {
+          const update = updates.find((u) => u.id === group.id);
+          return update ? { ...group, sortOrder: update.sortOrder, updatedAt: update.updatedAt } : group;
+        })
+        .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
+    }));
+  },
+
+  reorderCategories: async (categoryIds) => {
+    const now = Date.now();
+    // Update sortOrder for each category in the new order
+    const updates = categoryIds.map((id, index) => ({
+      id,
+      sortOrder: index,
+      updatedAt: now,
+    }));
+
+    // Persist to database
+    await Promise.all(
+      updates.map(({ id, sortOrder, updatedAt }) =>
+        db.categories.update(id, { sortOrder, updatedAt })
+      )
+    );
+
+    // Update local state
+    set((state) => ({
+      categories: state.categories
+        .map((cat) => {
+          const update = updates.find((u) => u.id === cat.id);
+          return update ? { ...cat, sortOrder: update.sortOrder, updatedAt: update.updatedAt } : cat;
+        })
+        .sort((a, b) => a.sortOrder - b.sortOrder),
+    }));
   },
 
   getSnapshot: () => {

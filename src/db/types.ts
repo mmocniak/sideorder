@@ -14,6 +14,7 @@ export interface MenuItem {
   baseCost?: number;
   available: boolean;
   modifierGroupIds: string[];
+  sortOrder: number;
   createdAt: number;
   updatedAt: number;
 }
@@ -32,6 +33,7 @@ export interface ModifierGroup {
   multiSelect: boolean;
   required: boolean;
   available: boolean;
+  sortOrder: number;
   createdAt: number;
   updatedAt: number;
 }
@@ -95,10 +97,10 @@ export function isNewCustomizations(
   return Array.isArray(values[0]);
 }
 
-// For creating new records
-export type NewCategory = Omit<Category, 'id' | 'createdAt' | 'updatedAt'>;
-export type NewMenuItem = Omit<MenuItem, 'id' | 'createdAt' | 'updatedAt'>;
-export type NewModifierGroup = Omit<ModifierGroup, 'id' | 'createdAt' | 'updatedAt'>;
+// For creating new records (sortOrder is auto-assigned if not provided)
+export type NewCategory = Omit<Category, 'id' | 'createdAt' | 'updatedAt'> & { sortOrder?: number };
+export type NewMenuItem = Omit<MenuItem, 'id' | 'createdAt' | 'updatedAt' | 'sortOrder'> & { sortOrder?: number };
+export type NewModifierGroup = Omit<ModifierGroup, 'id' | 'createdAt' | 'updatedAt' | 'sortOrder'> & { sortOrder?: number };
 export type NewOrder = Omit<Order, 'id' | 'timestamp'>;
 
 // App settings (key-value store)

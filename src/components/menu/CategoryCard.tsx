@@ -6,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { DragHandle } from '@/components/ui/sortable-list';
 import { cn } from '@/lib/utils';
 import type { Category } from '@/db/types';
 
@@ -15,6 +16,7 @@ interface CategoryCardProps {
   onEdit: (category: Category) => void;
   onDelete: (id: string) => void;
   onToggleAvailable: (id: string, available: boolean) => void;
+  showDragHandle?: boolean;
 }
 
 export function CategoryCard({
@@ -23,15 +25,17 @@ export function CategoryCard({
   onEdit,
   onDelete,
   onToggleAvailable,
+  showDragHandle = false,
 }: CategoryCardProps) {
   return (
     <div
       className={cn(
-        'flex items-center justify-between rounded-lg border bg-white p-3 transition-opacity',
+        'flex items-center gap-2 rounded-lg border bg-white p-3 transition-opacity',
         !category.available && 'border-dashed opacity-60'
       )}
     >
-      <div className="flex items-center gap-2">
+      {showDragHandle && <DragHandle />}
+      <div className="flex flex-1 items-center gap-2">
         <span className="font-medium text-espresso">{category.name}</span>
         <span className="rounded-full bg-oat-100 px-2 py-0.5 text-xs text-oat-600">
           {itemCount} {itemCount === 1 ? 'item' : 'items'}

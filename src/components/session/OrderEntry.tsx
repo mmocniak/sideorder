@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import type { MenuItem, ModifierGroup, Category, OrderCustomizations } from '@/db/types';
+import type { MenuItem, ModifierGroup, Category, OrderCustomizations, Order } from '@/db/types';
 
 interface OrderEntryProps {
   items: MenuItem[];
@@ -21,12 +21,60 @@ interface OrderEntryProps {
     customizations: OrderCustomizations;
     notes: string;
   }) => void;
+  editingOrder?: Order | null;
+  onCancelEdit?: () => void;
+  onUpdate?: (orderId: string, updates: {
+    customizations: OrderCustomizations;
+    notes: string;
+  }) => void;
 }
 
-export function OrderEntry({ items, modifierGroups, categories, onSubmit }: OrderEntryProps) {
+export function OrderEntry({
+  items,
+  modifierGroups,
+  categories,
+  onSubmit,
+  editingOrder,
+  onCancelEdit,
+  onUpdate,
+}: OrderEntryProps) {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<OrderCustomizations>({});
   const [notes, setNotes] = useState('');
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  // When editingOrder changes, populate the form
+  useEffect(() => {
+    if (editingOrder) {
+      // Find the menu item by name
+      const item = items.find((i) => i.name === editingOrder.itemName);
+      if (item) {
+        setSelectedItem(item);
+        // Convert legacy customizations to new format if needed
+        const customizations = editingOrder.customizations;
+        if (customizations && typeof Object.values(customizations)[0] === 'string') {
+          // Legacy format: convert string values to arrays
+          const converted: OrderCustomizations = {};
+          Object.entries(customizations).forEach(([key, value]) => {
+            if (value) {
+              // Find the modifier group that matches this legacy category
+              const group = modifierGroups.find(
+                (g) => g.name.toLowerCase() === key.toLowerCase()
+              );
+              if (group) {
+                converted[group.id] = [value as string];
+              }
+            }
+          });
+          setSelectedOptions(converted);
+        } else {
+          setSelectedOptions(customizations as OrderCustomizations);
+        }
+        setNotes(editingOrder.notes || '');
+        setIsEditDialogOpen(true);
+      }
+    }
+  }, [editingOrder, items, modifierGroups]);
 
   // Create a lookup map for category names
   const getCategoryName = (categoryId: string) => {
@@ -96,16 +144,33 @@ export function OrderEntry({ items, modifierGroups, categories, onSubmit }: Orde
   const handleSubmit = () => {
     if (!selectedItem) return;
 
-    onSubmit({
-      itemName: selectedItem.name,
-      itemCategory: getCategoryName(selectedItem.categoryId),
-      customizations: selectedOptions,
-      notes,
-    });
+    if (editingOrder && onUpdate) {
+      // Editing existing order
+      onUpdate(editingOrder.id, {
+        customizations: selectedOptions,
+        notes,
+      });
+      handleCloseEditDialog();
+    } else {
+      // Creating new order
+      onSubmit({
+        itemName: selectedItem.name,
+        itemCategory: getCategoryName(selectedItem.categoryId),
+        customizations: selectedOptions,
+        notes,
+      });
+      setSelectedItem(null);
+      setSelectedOptions({});
+      setNotes('');
+    }
+  };
 
+  const handleCloseEditDialog = () => {
+    setIsEditDialogOpen(false);
     setSelectedItem(null);
     setSelectedOptions({});
     setNotes('');
+    onCancelEdit?.();
   };
 
   const handleQuickAdd = (item: MenuItem) => {
@@ -164,10 +229,23 @@ export function OrderEntry({ items, modifierGroups, categories, onSubmit }: Orde
       </div>
 
       {/* Customization Dialog */}
-      <Dialog open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
+      <Dialog
+        open={editingOrder ? isEditDialogOpen : !!selectedItem}
+        onOpenChange={(open) => {
+          if (!open) {
+            if (editingOrder) {
+              handleCloseEditDialog();
+            } else {
+              setSelectedItem(null);
+            }
+          }
+        }}
+      >
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{selectedItem?.name}</DialogTitle>
+            <DialogTitle>
+              {editingOrder ? `Edit: ${selectedItem?.name}` : selectedItem?.name}
+            </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
@@ -198,7 +276,13 @@ export function OrderEntry({ items, modifierGroups, categories, onSubmit }: Orde
             <Button
               variant="outline"
               className="flex-1"
-              onClick={() => setSelectedItem(null)}
+              onClick={() => {
+                if (editingOrder) {
+                  handleCloseEditDialog();
+                } else {
+                  setSelectedItem(null);
+                }
+              }}
             >
               Cancel
             </Button>
@@ -208,7 +292,7 @@ export function OrderEntry({ items, modifierGroups, categories, onSubmit }: Orde
               onClick={handleSubmit}
               disabled={!hasAllRequired}
             >
-              Add Order
+              {editingOrder ? 'Save Changes' : 'Add Order'}
             </Button>
           </div>
         </DialogContent>
