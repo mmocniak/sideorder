@@ -11,6 +11,9 @@
   - Running total in session stats card
   - Summary with prices per item type on closed sessions
   - Items without prices display "—"
+- **Light/Dark/Auto theme toggle** - Choose between light mode, dark mode, or auto (follows system preference) from the Settings menu on the home page
+  - Theme preference persists in IndexedDB
+  - Auto mode responds to system theme changes in real-time
 
 ### Technical
 - Added @dnd-kit for drag-and-drop functionality
@@ -18,6 +21,10 @@
 - Database migration v5 for existing item ordering
 - New `SortableList` and `DragHandle` components
 - Price calculation utilities: `calculateOrderPrice()`, `calculateTotalRevenue()`, `formatPrice()`
+- Theme system using CSS custom properties with `.dark` class
+- New `src/lib/theme.ts` utility for theme application and system change listener
+- Added `theme` state to settings store
+- Updated all UI components to use semantic color tokens (e.g., `text-foreground`, `bg-card`, `border-border`)
 
 ---
 

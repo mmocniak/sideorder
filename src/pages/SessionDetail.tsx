@@ -33,7 +33,7 @@ export function SessionDetail() {
   if (!session) {
     return (
       <div className="py-16 text-center">
-        <p className="text-oat-500">Session not found</p>
+        <p className="text-muted-foreground">Session not found</p>
         <Button variant="link" onClick={() => navigate('/history')}>
           Back to history
         </Button>
@@ -79,7 +79,7 @@ export function SessionDetail() {
         <Button
           variant="ghost"
           size="icon"
-          className="text-oat-500 hover:text-red-600"
+          className="text-muted-foreground hover:text-red-600"
           onClick={() => setShowDeleteConfirm(true)}
         >
           <Trash2 className="h-5 w-5" />
@@ -88,13 +88,13 @@ export function SessionDetail() {
 
       {/* Session Info */}
       <div>
-        <h1 className="font-display text-2xl font-bold text-espresso">
+        <h1 className="font-display text-2xl font-bold text-foreground">
           {session.name || formatSessionDate(session.startedAt)}
         </h1>
         {session.name && (
-          <p className="text-sm text-oat-500">{formatSessionDate(session.startedAt)}</p>
+          <p className="text-sm text-muted-foreground">{formatSessionDate(session.startedAt)}</p>
         )}
-        <div className="mt-1 flex items-center gap-4 text-sm text-oat-600">
+        <div className="mt-1 flex items-center gap-4 text-sm text-muted-foreground">
           <span className="flex items-center gap-1">
             <Clock className="h-4 w-4" />
             {formatTime(session.startedAt)}
@@ -102,7 +102,7 @@ export function SessionDetail() {
           </span>
         </div>
         {session.notes && (
-          <p className="mt-2 text-sm italic text-oat-600">
+          <p className="mt-2 text-sm italic text-muted-foreground">
             "{session.notes}"
           </p>
         )}
@@ -114,10 +114,10 @@ export function SessionDetail() {
       {/* Order Summary */}
       {Object.keys(orderSummary).length > 0 && (
         <div>
-          <h2 className="mb-3 font-display text-lg font-semibold text-espresso">
+          <h2 className="mb-3 font-display text-lg font-semibold text-foreground">
             Summary
           </h2>
-          <div className="rounded-xl bg-white p-4 shadow-warm">
+          <div className="rounded-xl bg-card p-4 shadow-warm">
             <div className="space-y-2">
               {Object.entries(orderSummary)
                 .sort((a, b) => b[1].count - a[1].count)
@@ -126,12 +126,12 @@ export function SessionDetail() {
                     key={item}
                     className="flex items-center justify-between text-sm"
                   >
-                    <span className="text-espresso">{item}</span>
+                    <span className="text-foreground">{item}</span>
                     <div className="flex items-center gap-3">
                       {hasPrice && (
-                        <span className="text-oat-500">{formatPrice(totalPrice)}</span>
+                        <span className="text-muted-foreground">{formatPrice(totalPrice)}</span>
                       )}
-                      <span className="font-medium text-oat-600">×{count}</span>
+                      <span className="font-medium text-muted-foreground">×{count}</span>
                     </div>
                   </div>
                 ))}
@@ -142,7 +142,7 @@ export function SessionDetail() {
 
       {/* All Orders */}
       <div>
-        <h2 className="mb-3 font-display text-lg font-semibold text-espresso">
+        <h2 className="mb-3 font-display text-lg font-semibold text-foreground">
           All Orders
         </h2>
         <OrderList orders={orders} readonly menuSnapshot={session.menuSnapshot} />
@@ -154,7 +154,7 @@ export function SessionDetail() {
           <DialogHeader>
             <DialogTitle>Delete Session?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-oat-600">
+          <p className="text-sm text-muted-foreground">
             This will permanently delete this session and all {orders.length} orders.
             This action cannot be undone.
           </p>

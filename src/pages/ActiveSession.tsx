@@ -100,10 +100,10 @@ export function ActiveSession() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold text-espresso">
+          <h1 className="font-display text-2xl font-bold text-foreground">
             {activeSession.name || 'Active Session'}
           </h1>
-          <p className="text-sm text-oat-600">
+          <p className="text-sm text-muted-foreground">
             {activeSession.name ? 'Active Session' : 'Log orders as they come in'}
           </p>
         </div>
@@ -214,7 +214,7 @@ export function ActiveSession() {
           <DialogHeader>
             <DialogTitle>End Session?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-oat-600">
+          <p className="text-sm text-muted-foreground">
             This will close the current session with {orders.length} orders.
             You can still view this session in your history.
           </p>

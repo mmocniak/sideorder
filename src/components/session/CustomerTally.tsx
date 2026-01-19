@@ -18,8 +18,8 @@ export function CustomerTally({ count, onChange }: CustomerTallyProps) {
   };
 
   return (
-    <div className="rounded-xl bg-white p-3 shadow-warm">
-      <div className="mb-2 flex items-center gap-2 text-xs font-medium text-oat-600">
+    <div className="rounded-xl bg-card p-3 shadow-warm">
+      <div className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground">
         <Users className="h-3.5 w-3.5" />
         Customers
       </div>
@@ -27,19 +27,19 @@ export function CustomerTally({ count, onChange }: CustomerTallyProps) {
         <Button
           variant="outline"
           size="icon"
-          className="h-11 w-11 rounded-lg border-2 text-oat-500 hover:border-espresso hover:text-espresso active:scale-95"
+          className="h-11 w-11 rounded-lg border-2 text-muted-foreground hover:border-primary hover:text-primary active:scale-95"
           onClick={handleDecrement}
           disabled={count === 0}
         >
           <Minus className="h-5 w-5" />
         </Button>
-        <span className="min-w-[3rem] text-center font-display text-2xl font-bold text-espresso">
+        <span className="min-w-[3rem] text-center font-display text-2xl font-bold text-foreground">
           {count}
         </span>
         <Button
           variant="outline"
           size="icon"
-          className="h-11 w-11 rounded-lg border-2 border-terracotta text-terracotta hover:bg-terracotta hover:text-white active:scale-95"
+          className="h-11 w-11 rounded-lg border-2 border-accent text-accent hover:bg-accent hover:text-accent-foreground active:scale-95"
           onClick={handleIncrement}
         >
           <Plus className="h-5 w-5" />

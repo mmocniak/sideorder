@@ -28,15 +28,15 @@ export function MenuItemCard({
   return (
     <div
       className={cn(
-        'flex items-center gap-2 rounded-lg border bg-white p-3 transition-opacity',
+        'flex items-center gap-2 rounded-lg border bg-card p-3 transition-opacity',
         !item.available && 'border-dashed opacity-60'
       )}
     >
       {showDragHandle && <DragHandle />}
       <div className="flex-1">
-        <span className="font-medium text-espresso">{item.name}</span>
+        <span className="font-medium text-foreground">{item.name}</span>
         {item.baseCost !== undefined && (
-          <span className="ml-2 text-sm text-oat-500">
+          <span className="ml-2 text-sm text-muted-foreground">
             ${item.baseCost.toFixed(2)}
           </span>
         )}
@@ -45,7 +45,7 @@ export function MenuItemCard({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="h-8 w-8">
-            <MoreVertical className="h-4 w-4 text-oat-500" />
+            <MoreVertical className="h-4 w-4 text-muted-foreground" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">

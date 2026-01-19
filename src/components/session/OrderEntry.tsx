@@ -207,7 +207,7 @@ export function OrderEntry({
 
           return (
             <div key={category.id}>
-              <h3 className="mb-2 text-sm font-medium text-oat-600">
+              <h3 className="mb-2 text-sm font-medium text-muted-foreground">
                 {category.name}
               </h3>
               <div className="grid grid-cols-1 gap-2">
@@ -216,10 +216,10 @@ export function OrderEntry({
                     key={item.id}
                     onClick={() => handleItemSelect(item)}
                     onDoubleClick={() => handleQuickAdd(item)}
-                    className="group relative rounded-lg border border-oat-200 bg-white p-5 text-left transition-all hover:border-terracotta hover:shadow-warm active:bg-oat-50"
+                    className="group relative rounded-lg border border-border bg-card p-5 text-left transition-all hover:border-accent hover:shadow-warm active:bg-muted"
                   >
-                    <span className="font-medium text-espresso">{item.name}</span>
-                    <Plus className="absolute right-2 top-2 h-4 w-4 text-oat-400 opacity-0 transition-opacity group-hover:opacity-100" />
+                    <span className="font-medium text-foreground">{item.name}</span>
+                    <Plus className="absolute right-2 top-2 h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
                   </button>
                 ))}
               </div>
@@ -261,7 +261,7 @@ export function OrderEntry({
 
             {/* Notes */}
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-espresso">
+              <label className="mb-1.5 block text-sm font-medium text-foreground">
                 Notes
               </label>
               <Input
@@ -319,9 +319,9 @@ function ModifierGroupSelector({
   return (
     <div>
       <div className="mb-1.5 flex items-center gap-2">
-        <label className="text-sm font-medium text-espresso">{group.name}</label>
+        <label className="text-sm font-medium text-foreground">{group.name}</label>
         {group.required && (
-          <span className="text-xs text-terracotta">Required</span>
+          <span className="text-xs text-accent">Required</span>
         )}
       </div>
       <div className="flex flex-wrap gap-2">
@@ -341,8 +341,8 @@ function ModifierGroupSelector({
                 className={cn(
                   'rounded-full border px-4 py-2 text-sm transition-colors active:scale-95',
                   isSelected
-                    ? 'border-terracotta bg-terracotta/10 text-terracotta'
-                    : 'border-oat-200 bg-white text-espresso hover:border-oat-300'
+                    ? 'border-accent bg-accent/10 text-accent'
+                    : 'border-border bg-card text-foreground hover:border-muted-foreground'
                 )}
               >
                 {option.name}
@@ -359,8 +359,8 @@ function ModifierGroupSelector({
               className={cn(
                 'rounded-lg border px-4 py-2.5 text-sm transition-colors active:scale-95',
                 isSelected
-                  ? 'border-terracotta bg-terracotta text-white'
-                  : 'border-oat-200 bg-white text-espresso hover:border-oat-300'
+                  ? 'border-accent bg-accent text-accent-foreground'
+                  : 'border-border bg-card text-foreground hover:border-muted-foreground'
               )}
             >
               {option.name}

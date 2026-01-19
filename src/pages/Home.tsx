@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Clock, Settings } from 'lucide-react';
+import { Plus, Clock, Settings, Sun, Moon, Monitor } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,17 +11,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { SessionCard } from '@/components/session/SessionCard';
 import { useSessionStore } from '@/stores/sessionStore';
 import { useMenuStore } from '@/stores/menuStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { getTagline } from '@/lib/taglines';
+import type { Theme } from '@/lib/theme';
 
 export function Home() {
   const navigate = useNavigate();
   const { sessions, activeSession, startSession } = useSessionStore();
   const { getSnapshot } = useMenuStore();
-  const { shopName, updateShopName } = useSettingsStore();
+  const { shopName, updateShopName, theme, updateTheme } = useSettingsStore();
   const [showStartDialog, setShowStartDialog] = useState(false);
   const [sessionName, setSessionName] = useState('');
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
@@ -46,16 +54,16 @@ export function Home() {
     <div className="space-y-6">
       {/* Hero Section */}
       <div className="text-center">
-        <h1 className="font-display text-3xl font-bold text-espresso">
+        <h1 className="font-display text-3xl font-bold text-foreground">
           {shopName}
         </h1>
-        <p className="mt-1 text-oat-600">{tagline}</p>
+        <p className="mt-1 text-muted-foreground">{tagline}</p>
       </div>
 
       {/* Active Session or Start New */}
       {activeSession ? (
         <div className="space-y-3">
-          <h2 className="font-display text-lg font-semibold text-espresso">
+          <h2 className="font-display text-lg font-semibold text-foreground">
             Active Session
           </h2>
           <SessionCard session={activeSession} />
@@ -63,13 +71,13 @@ export function Home() {
       ) : (
         <Card className="overflow-hidden">
           <CardContent className="p-6 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-oat-100">
-              <Plus className="h-8 w-8 text-espresso" />
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
+              <Plus className="h-8 w-8 text-foreground" />
             </div>
-            <h2 className="font-display text-xl font-semibold text-espresso">
+            <h2 className="font-display text-xl font-semibold text-foreground">
               Ready to open?
             </h2>
-            <p className="mt-1 text-sm text-oat-600">
+            <p className="mt-1 text-sm text-muted-foreground">
               Start a new session to begin logging orders
             </p>
             <Button onClick={() => setShowStartDialog(true)} className="mt-4 w-full">
@@ -83,7 +91,7 @@ export function Home() {
       {recentSessions.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg font-semibold text-espresso">
+            <h2 className="font-display text-lg font-semibold text-foreground">
               Recent Sessions
             </h2>
             <Button
@@ -139,13 +147,13 @@ export function Home() {
 
       {/* Version & Settings */}
       <div className="flex flex-col items-center gap-2 pt-4">
-        <p className="text-xs text-oat-400">v{__APP_VERSION__}</p>
+        <p className="text-xs text-muted-foreground/60">v{__APP_VERSION__}</p>
         <button
           onClick={() => {
             setEditingShopName(shopName);
             setShowSettingsDialog(true);
           }}
-          className="flex min-h-0 items-center gap-1.5 rounded-full bg-oat-100 px-3 py-2 text-xs text-oat-600 transition-colors hover:bg-oat-200"
+          className="flex min-h-0 items-center gap-1.5 rounded-full bg-secondary px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-secondary/80"
         >
           <Settings className="h-3 w-3" />
           Settings
@@ -169,8 +177,36 @@ export function Home() {
                 autoComplete="off"
                 className="mt-1.5"
               />
-              <p className="mt-1 text-xs text-oat-500">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Displayed at the top of the home page
+              </p>
+            </div>
+            <div>
+              <Label>Theme</Label>
+              <Select value={theme} onValueChange={(v) => updateTheme(v as Theme)}>
+                <SelectTrigger className="mt-1.5">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light">
+                    <span className="flex items-center gap-2">
+                      <Sun className="h-4 w-4" /> Light
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="dark">
+                    <span className="flex items-center gap-2">
+                      <Moon className="h-4 w-4" /> Dark
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="auto">
+                    <span className="flex items-center gap-2">
+                      <Monitor className="h-4 w-4" /> Auto
+                    </span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Auto follows your system preference
               </p>
             </div>
           </div>

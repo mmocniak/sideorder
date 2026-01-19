@@ -17,9 +17,9 @@ interface OrderListProps {
 export function OrderList({ orders, onDelete, onEdit, readonly = false, menuSnapshot }: OrderListProps) {
   if (orders.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-oat-300 bg-oat-50 py-12 text-center">
-        <p className="text-oat-500">No orders yet</p>
-        <p className="mt-1 text-sm text-oat-400">
+      <div className="rounded-xl border border-dashed border-border bg-muted/50 py-12 text-center">
+        <p className="text-muted-foreground">No orders yet</p>
+        <p className="mt-1 text-sm text-muted-foreground/70">
           Tap a drink to log an order
         </p>
       </div>
@@ -77,24 +77,24 @@ function OrderItem({ order, onDelete, onEdit, readonly, menuSnapshot }: OrderIte
 
   return (
     <>
-      <div className="group flex items-center justify-between rounded-lg bg-white p-3 shadow-warm">
+      <div className="group flex items-center justify-between rounded-lg bg-card p-3 shadow-warm">
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-espresso">{order.itemName}</span>
-            <span className="text-xs text-oat-500">{formatTime(order.timestamp)}</span>
+            <span className="font-medium text-foreground">{order.itemName}</span>
+            <span className="text-xs text-muted-foreground">{formatTime(order.timestamp)}</span>
           </div>
           {customizations.length > 0 && (
-            <p className="mt-0.5 text-sm text-oat-600">
+            <p className="mt-0.5 text-sm text-muted-foreground">
               {customizations.join(' · ')}
             </p>
           )}
           {order.notes && (
-            <p className="mt-0.5 text-xs italic text-oat-500">"{order.notes}"</p>
+            <p className="mt-0.5 text-xs italic text-muted-foreground">"{order.notes}"</p>
           )}
         </div>
         <div className="flex items-center gap-2">
           {menuSnapshot && (
-            <span className="text-sm font-medium text-oat-600">
+            <span className="text-sm font-medium text-muted-foreground">
               {formatPrice(price)}
             </span>
           )}
@@ -107,7 +107,7 @@ function OrderItem({ order, onDelete, onEdit, readonly, menuSnapshot }: OrderIte
                   className="h-8 w-8"
                   onClick={() => onEdit(order)}
                 >
-                  <Pencil className="h-4 w-4 text-oat-500" />
+                  <Pencil className="h-4 w-4 text-muted-foreground" />
                 </Button>
               )}
               {onDelete && (
@@ -117,7 +117,7 @@ function OrderItem({ order, onDelete, onEdit, readonly, menuSnapshot }: OrderIte
                   className="h-8 w-8"
                   onClick={() => setShowDeleteConfirm(true)}
                 >
-                  <Trash2 className="h-4 w-4 text-oat-500" />
+                  <Trash2 className="h-4 w-4 text-muted-foreground" />
                 </Button>
               )}
             </div>

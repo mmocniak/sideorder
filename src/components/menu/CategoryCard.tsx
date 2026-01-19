@@ -30,14 +30,14 @@ export function CategoryCard({
   return (
     <div
       className={cn(
-        'flex items-center gap-2 rounded-lg border bg-white p-3 transition-opacity',
+        'flex items-center gap-2 rounded-lg border bg-card p-3 transition-opacity',
         !category.available && 'border-dashed opacity-60'
       )}
     >
       {showDragHandle && <DragHandle />}
       <div className="flex flex-1 items-center gap-2">
-        <span className="font-medium text-espresso">{category.name}</span>
-        <span className="rounded-full bg-oat-100 px-2 py-0.5 text-xs text-oat-600">
+        <span className="font-medium text-foreground">{category.name}</span>
+        <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
           {itemCount} {itemCount === 1 ? 'item' : 'items'}
         </span>
       </div>
@@ -45,7 +45,7 @@ export function CategoryCard({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="h-8 w-8">
-            <MoreVertical className="h-4 w-4 text-oat-500" />
+            <MoreVertical className="h-4 w-4 text-muted-foreground" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">

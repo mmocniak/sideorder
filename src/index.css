@@ -36,6 +36,37 @@
     --radius: 0.75rem;
   }
 
+  .dark {
+    /* Dark theme - warm roast tones */
+    --background: 20 14% 10%;
+    --foreground: 40 33% 92%;
+
+    --card: 20 14% 14%;
+    --card-foreground: 40 33% 92%;
+
+    --popover: 20 14% 14%;
+    --popover-foreground: 40 33% 92%;
+
+    --primary: 30 18% 75%;
+    --primary-foreground: 20 14% 10%;
+
+    --secondary: 20 14% 20%;
+    --secondary-foreground: 40 33% 88%;
+
+    --muted: 20 14% 20%;
+    --muted-foreground: 30 18% 55%;
+
+    --accent: 24 52% 58%;
+    --accent-foreground: 20 14% 10%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 20 14% 24%;
+    --input: 20 14% 24%;
+    --ring: 24 52% 54%;
+  }
+
   * {
     @apply border-border;
   }
@@ -70,41 +101,41 @@
 @layer components {
   /* Card with warm shadow */
   .card-warm {
-    @apply bg-white rounded-xl shadow-warm;
+    @apply bg-card rounded-xl shadow-warm;
   }
 
   /* Primary button style */
   .btn-primary {
-    @apply bg-terracotta hover:bg-terracotta-600 text-white font-medium 
+    @apply bg-accent hover:bg-accent/90 text-accent-foreground font-medium
            px-4 py-2.5 rounded-lg transition-colors duration-150
-           focus:outline-none focus:ring-2 focus:ring-terracotta focus:ring-offset-2;
+           focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2;
   }
 
   /* Secondary button style */
   .btn-secondary {
-    @apply bg-oat-100 hover:bg-oat-200 text-espresso font-medium 
+    @apply bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium
            px-4 py-2.5 rounded-lg transition-colors duration-150
-           focus:outline-none focus:ring-2 focus:ring-espresso focus:ring-offset-2;
+           focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
   }
 
   /* Ghost button style */
   .btn-ghost {
-    @apply hover:bg-oat-100 text-espresso font-medium 
+    @apply hover:bg-secondary text-foreground font-medium
            px-4 py-2.5 rounded-lg transition-colors duration-150
-           focus:outline-none focus:ring-2 focus:ring-espresso focus:ring-offset-2;
+           focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
   }
 
   /* Input field styling */
   .input-field {
-    @apply w-full px-3 py-2.5 rounded-lg border border-oat-300 
-           bg-white text-roast placeholder:text-oat-500
-           focus:outline-none focus:ring-2 focus:ring-espresso focus:border-transparent
+    @apply w-full px-3 py-2.5 rounded-lg border border-border
+           bg-card text-foreground placeholder:text-muted-foreground
+           focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent
            transition-all duration-150;
   }
 
   /* Section heading */
   .heading-display {
-    @apply font-display text-espresso font-semibold;
+    @apply font-display text-foreground font-semibold;
   }
 }
 

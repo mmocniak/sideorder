@@ -30,17 +30,17 @@ export function SessionCard({ session, linkTo }: SessionCardProps) {
         <div className="flex items-center justify-between p-4">
           <div className="flex-1 space-y-1">
             <div className="flex items-center gap-2">
-              <span className="font-display font-medium text-espresso">
+              <span className="font-display font-medium text-foreground">
                 {session.name || formatSessionDate(session.startedAt)}
               </span>
               {isActive && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-terracotta/10 px-2 py-0.5 text-xs font-medium text-terracotta">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-terracotta" />
+                <span className="inline-flex items-center gap-1 rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" />
                   Active
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-4 text-sm text-oat-600">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-1">
                 <Clock className="h-3.5 w-3.5" />
                 {formatTime(session.startedAt)}
@@ -58,12 +58,12 @@ export function SessionCard({ session, linkTo }: SessionCardProps) {
               )}
             </div>
             {!isActive && session.endedAt && (
-              <p className="text-xs text-oat-500">
+              <p className="text-xs text-muted-foreground">
                 Duration: {formatDuration(session.startedAt, session.endedAt)}
               </p>
             )}
           </div>
-          <ChevronRight className="h-5 w-5 text-oat-400 transition-transform group-hover:translate-x-0.5" />
+          <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
         </div>
       </Card>
     </Link>

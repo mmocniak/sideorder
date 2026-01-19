@@ -127,7 +127,7 @@ export function MenuItemForm({
               placeholder="3.50"
               className="mt-1.5"
             />
-            <p className="mt-1 text-xs text-oat-500">
+            <p className="mt-1 text-xs text-muted-foreground">
               For future cost tracking
             </p>
           </div>
@@ -135,32 +135,32 @@ export function MenuItemForm({
           {modifierGroups.length > 0 && (
             <div>
               <Label>Modifier Groups</Label>
-              <p className="mb-2 text-xs text-oat-500">
+              <p className="mb-2 text-xs text-muted-foreground">
                 Select which customizations apply to this item
               </p>
               <div className="space-y-2">
                 {modifierGroups.map((group) => (
                   <label
                     key={group.id}
-                    className="flex items-center gap-3 rounded-lg border border-oat-200 bg-oat-50 px-3 py-2 cursor-pointer hover:bg-oat-100 transition-colors"
+                    className="flex items-center gap-3 rounded-lg border border-border bg-secondary px-3 py-2 cursor-pointer hover:bg-secondary/80 transition-colors"
                   >
                     <input
                       type="checkbox"
                       checked={selectedGroupIds.includes(group.id)}
                       onChange={() => handleToggleGroup(group.id)}
-                      className="h-4 w-4 rounded border-oat-300 text-terracotta focus:ring-terracotta"
+                      className="h-4 w-4 rounded border-border text-accent focus:ring-accent"
                     />
                     <div className="flex-1">
-                      <span className="text-sm font-medium text-espresso">
+                      <span className="text-sm font-medium text-foreground">
                         {group.name}
                       </span>
-                      <span className="ml-2 text-xs text-oat-500">
+                      <span className="ml-2 text-xs text-muted-foreground">
                         ({group.options.filter((o) => o.available).length} options)
                       </span>
                     </div>
                     <div className="flex gap-1">
                       {group.multiSelect && (
-                        <span className="rounded-full bg-oat-200 px-1.5 py-0.5 text-[10px] text-oat-600">
+                        <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
                           Multi
                         </span>
                       )}

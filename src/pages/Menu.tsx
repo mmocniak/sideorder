@@ -145,10 +145,10 @@ export function Menu() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold text-espresso">
+          <h1 className="font-display text-2xl font-bold text-foreground">
             Menu
           </h1>
-          <p className="text-sm text-oat-600">
+          <p className="text-sm text-muted-foreground">
             Manage items and modifier groups
           </p>
         </div>
@@ -195,7 +195,7 @@ export function Menu() {
 
             return (
               <div key={category.id}>
-                <h3 className="mb-2 text-sm font-medium text-oat-600">
+                <h3 className="mb-2 text-sm font-medium text-muted-foreground">
                   {category.name}
                 </h3>
                 <SortableList
@@ -225,8 +225,8 @@ export function Menu() {
           })}
 
           {items.length === 0 && (
-            <div className="rounded-xl border border-dashed border-oat-300 bg-oat-50 py-12 text-center">
-              <p className="text-oat-500">No menu items yet</p>
+            <div className="rounded-xl border border-dashed border-border bg-muted/50 py-12 text-center">
+              <p className="text-muted-foreground">No menu items yet</p>
               <Button
                 variant="link"
                 onClick={() => setShowItemForm(true)}
@@ -263,8 +263,8 @@ export function Menu() {
               )}
             />
           ) : (
-            <div className="rounded-xl border border-dashed border-oat-300 bg-oat-50 py-12 text-center">
-              <p className="text-oat-500">No modifier groups yet</p>
+            <div className="rounded-xl border border-dashed border-border bg-muted/50 py-12 text-center">
+              <p className="text-muted-foreground">No modifier groups yet</p>
               <Button
                 variant="link"
                 onClick={() => setShowGroupForm(true)}
@@ -302,8 +302,8 @@ export function Menu() {
               )}
             />
           ) : (
-            <div className="rounded-xl border border-dashed border-oat-300 bg-oat-50 py-12 text-center">
-              <p className="text-oat-500">No categories yet</p>
+            <div className="rounded-xl border border-dashed border-border bg-muted/50 py-12 text-center">
+              <p className="text-muted-foreground">No categories yet</p>
               <Button
                 variant="link"
                 onClick={() => setShowCategoryForm(true)}

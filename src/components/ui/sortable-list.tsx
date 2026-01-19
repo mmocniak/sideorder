@@ -148,7 +148,7 @@ export function DragHandle({ className }: DragHandleProps) {
       type="button"
       ref={setActivatorNodeRef}
       className={cn(
-        'touch-none cursor-grab active:cursor-grabbing p-1 text-oat-300 hover:text-oat-400 transition-colors',
+        'touch-none cursor-grab active:cursor-grabbing p-1 text-muted-foreground/40 hover:text-muted-foreground transition-colors',
         className
       )}
       {...attributes}

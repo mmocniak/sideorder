@@ -30,7 +30,7 @@ export function ModifierGroupCard({
   return (
     <div
       className={cn(
-        'rounded-lg border bg-white p-4 transition-opacity',
+        'rounded-lg border bg-card p-4 transition-opacity',
         !group.available && 'border-dashed opacity-60'
       )}
     >
@@ -38,12 +38,12 @@ export function ModifierGroupCard({
         {showDragHandle && <DragHandle className="mt-0.5" />}
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-espresso">{group.name}</span>
-            <span className="rounded-full bg-oat-100 px-2 py-0.5 text-xs text-oat-600">
+            <span className="font-medium text-foreground">{group.name}</span>
+            <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
               {group.multiSelect ? 'Multi' : 'Single'}
             </span>
             {group.required && (
-              <span className="rounded-full bg-terracotta/10 px-2 py-0.5 text-xs text-terracotta">
+              <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent">
                 Required
               </span>
             )}
@@ -52,16 +52,16 @@ export function ModifierGroupCard({
             {availableOptions.map((option) => (
               <span
                 key={option.id}
-                className="rounded-md border border-oat-200 bg-oat-50 px-2 py-0.5 text-sm text-oat-700"
+                className="rounded-md border border-border bg-muted px-2 py-0.5 text-sm text-foreground"
               >
                 {option.name}
                 {option.priceAdditive != null && option.priceAdditive > 0 && (
-                  <span className="ml-1 text-oat-500">(+${option.priceAdditive.toFixed(2)})</span>
+                  <span className="ml-1 text-muted-foreground">(+${option.priceAdditive.toFixed(2)})</span>
                 )}
               </span>
             ))}
             {availableOptions.length === 0 && (
-              <span className="text-sm text-oat-400">No options</span>
+              <span className="text-sm text-muted-foreground">No options</span>
             )}
           </div>
         </div>
@@ -69,7 +69,7 @@ export function ModifierGroupCard({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreVertical className="h-4 w-4 text-oat-500" />
+              <MoreVertical className="h-4 w-4 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

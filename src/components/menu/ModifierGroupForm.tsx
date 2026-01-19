@@ -123,9 +123,9 @@ export function ModifierGroupForm({
                 type="checkbox"
                 checked={multiSelect}
                 onChange={(e) => setMultiSelect(e.target.checked)}
-                className="h-4 w-4 rounded border-oat-300 text-terracotta focus:ring-terracotta"
+                className="h-4 w-4 rounded border-border text-accent focus:ring-accent"
               />
-              <span className="text-sm text-espresso">Allow multiple selections</span>
+              <span className="text-sm text-foreground">Allow multiple selections</span>
             </label>
 
             <label className="flex items-center gap-2">
@@ -133,9 +133,9 @@ export function ModifierGroupForm({
                 type="checkbox"
                 checked={required}
                 onChange={(e) => setRequired(e.target.checked)}
-                className="h-4 w-4 rounded border-oat-300 text-terracotta focus:ring-terracotta"
+                className="h-4 w-4 rounded border-border text-accent focus:ring-accent"
               />
-              <span className="text-sm text-espresso">Required</span>
+              <span className="text-sm text-foreground">Required</span>
             </label>
           </div>
 
@@ -145,17 +145,17 @@ export function ModifierGroupForm({
               {options.map((option) => (
                 <div
                   key={option.id}
-                  className="flex items-center gap-2 rounded-lg border border-oat-200 bg-oat-50 px-3 py-2"
+                  className="flex items-center gap-2 rounded-lg border border-border bg-secondary px-3 py-2"
                 >
                   <span
                     className={`flex-1 text-sm ${
-                      option.available ? 'text-espresso' : 'text-oat-400 line-through'
+                      option.available ? 'text-foreground' : 'text-muted-foreground line-through'
                     }`}
                   >
                     {option.name}
                   </span>
                   <div className="flex items-center gap-1">
-                    <span className="text-xs text-oat-500">+$</span>
+                    <span className="text-xs text-muted-foreground">+$</span>
                     <input
                       type="number"
                       step="0.01"
@@ -163,20 +163,20 @@ export function ModifierGroupForm({
                       value={option.priceAdditive ?? ''}
                       onChange={(e) => handleUpdateOptionPrice(option.id, e.target.value)}
                       placeholder="0.00"
-                      className="w-16 rounded border border-oat-200 bg-white px-1.5 py-0.5 text-sm text-espresso placeholder:text-oat-300 focus:border-terracotta focus:outline-none focus:ring-1 focus:ring-terracotta"
+                      className="w-16 rounded border border-border bg-card px-1.5 py-0.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                     />
                   </div>
                   <button
                     type="button"
                     onClick={() => handleToggleOptionAvailable(option.id)}
-                    className="text-xs text-oat-500 hover:text-espresso"
+                    className="text-xs text-muted-foreground hover:text-foreground"
                   >
                     {option.available ? 'Hide' : 'Show'}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleRemoveOption(option.id)}
-                    className="text-oat-400 hover:text-red-500"
+                    className="text-muted-foreground hover:text-destructive"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -207,7 +207,7 @@ export function ModifierGroupForm({
               </div>
             </div>
             {options.length === 0 && (
-              <p className="mt-2 text-xs text-oat-500">
+              <p className="mt-2 text-xs text-muted-foreground">
                 Add at least one option
               </p>
             )}

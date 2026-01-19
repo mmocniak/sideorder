@@ -54,13 +54,13 @@ export function SessionStats({ session, orderCount, totalRevenue }: SessionStats
       {stats.map(({ icon: Icon, label, value }) => (
         <div
           key={label}
-          className="flex flex-col items-center rounded-xl bg-oat-100 p-3"
+          className="flex flex-col items-center rounded-xl bg-secondary p-3"
         >
-          <Icon className="mb-1 h-5 w-5 text-oat-500" />
-          <span className="font-display text-lg font-semibold text-espresso">
+          <Icon className="mb-1 h-5 w-5 text-muted-foreground" />
+          <span className="font-display text-lg font-semibold text-foreground">
             {value}
           </span>
-          <span className="text-xs text-oat-600">{label}</span>
+          <span className="text-xs text-muted-foreground">{label}</span>
         </div>
       ))}
     </div>

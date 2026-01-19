@@ -10,12 +10,14 @@ import { initializeDatabase } from '@/db';
 import { useSessionStore } from '@/stores/sessionStore';
 import { useMenuStore } from '@/stores/menuStore';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { applyTheme, listenForSystemThemeChange } from '@/lib/theme';
 
 function AppContent() {
   const [isReady, setIsReady] = useState(false);
   const loadSessions = useSessionStore((state) => state.loadSessions);
   const loadMenu = useMenuStore((state) => state.loadMenu);
   const loadSettings = useSettingsStore((state) => state.loadSettings);
+  const theme = useSettingsStore((state) => state.theme);
 
   useEffect(() => {
     async function init() {
@@ -26,12 +28,19 @@ function AppContent() {
     init();
   }, [loadSessions, loadMenu, loadSettings]);
 
+  // Listen for system theme changes when in auto mode
+  useEffect(() => {
+    if (theme === 'auto') {
+      return listenForSystemThemeChange(() => applyTheme('auto'));
+    }
+  }, [theme]);
+
   if (!isReady) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-cream">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-pulse rounded-full bg-espresso" />
-          <p className="text-oat-600">Loading...</p>
+          <div className="mx-auto mb-4 h-12 w-12 animate-pulse rounded-full bg-primary" />
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
